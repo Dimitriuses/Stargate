@@ -37,12 +37,12 @@ function create(to,dur){
 	myanim.setAttribute("attributeName","transform"); 
 	myanim.setAttribute("type","rotate");
 	
-	myanim.setAttribute("from",r+" 318.15 317.5"); 
+	myanim.setAttribute("from",r+" 282.902  268.802"); 
 	if(to == null){
-		myanim.setAttribute("to",(360+r)+" 318.15 317.5"); 
+		myanim.setAttribute("to",(360+r)+" 282.902  268.802"); 
 	}
 	else{
-		myanim.setAttribute("to",to+" 318.15 317.5"); 
+		myanim.setAttribute("to",to+" 282.902  268.802"); 
 	}
 	if(dur == null){dur = 10;}
 	myanim.setAttribute("dur",dur+"s"); 
@@ -164,6 +164,10 @@ function AdressSet(id){
 	}
 }
 
+function clearAdress(){
+	
+}
+
 async function toSynvol(id){
 	RA = true;
 	if(!ACancel){
@@ -184,7 +188,7 @@ async function toSynvol(id){
 		document.getElementById("ShColorB").setAttribute('class','stS');
 		BaseShevronAnimate();
 		await sleep(750);
-		document.getElementById("ShColorB").setAttribute('class','st3');
+		document.getElementById("ShColorB").setAttribute('class','st4');
 	}
 	
 	if(!ACancel){
