@@ -241,7 +241,7 @@ function AdressSet(id){
 			else{
 				if(isAuto){
 					ACancel = false;
-					toSynvol(id);
+					toSynvol(adress[locked + 1]);
 				}
 			}
 		}
