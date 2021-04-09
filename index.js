@@ -1,9 +1,12 @@
 var r = 0;
+var defaultShevronColorClass = "st5"
 var RA = false;
+var isOpenGate = false;
 var isAuto = true;
 var Sh = [false,false,false,false,false,false,false,false];
 var ACancel = false;
 var isClearFunction = false;
+var isPlaneToClear = false;
 var isTimeOut = false;
 var selected = -1;
 var locked = -1;
@@ -19,7 +22,7 @@ function AutoTurn(){
 	if(isAuto){
 		autoButton.setAttribute('class','FButton SelectedButton');
 		//powerButton.textContent = 'OFF';
-		powerOn();
+		//powerOn();
 	}
 	else{
 		autoButton.setAttribute('class','FButton');
@@ -28,12 +31,79 @@ function AutoTurn(){
 	}
 }
 
+function TurnGate(){
+	if(!isClearFunction){
+		if(locked == 7){
+			turnButtonGate();
+			turnOpenGate();
+		}
+		else{
+			if(selected == 7 && !isOpenGate){
+				turnButtonGate();
+				powerOn();
+			}
+			else if(isOpenGate){
+				
+			}
+			else if(selected != 7){
+				errorAnimation();
+			}
+			
+		}
+	}
+	
+	
+}
+
+function turnButtonGate(){
+	isOpenGate = !isOpenGate;
+	var gbutton = document.getElementById("TurnGateButton");
+	if(isOpenGate){
+		gbutton.setAttribute("class","FButton SelectedButton");
+	}
+	else{
+		gbutton.setAttribute("class","FButton");
+	}
+}
+async function turnOpenGate(){
+	var gate = document.getElementById("Portall");
+	if(isOpenGate){
+		document.getElementById("ShColorB").setAttribute('class','stS');
+		BaseShevronAnimate();
+		await sleep(750);
+		gate.setAttribute("class","stP");
+	}
+	else{
+		gate.setAttribute("class","st0");
+		BaseShevronAnimate();
+		await sleep(375);
+		if(isPlaneToClear){
+			await sleep(375);
+			clearAdress();
+		}
+		else{
+			document.getElementById("ShColorB").setAttribute('class',defaultShevronColorClass);
+		}
+		
+	}
+}
+
+async function errorAnimation(){
+	var gbutton = document.getElementById("TurnGateButton");
+	for(let i = 0; i <  7 - selected; i++ ){
+		gbutton.setAttribute("class","FButton ErrorButton");
+		await sleep(500);
+		gbutton.setAttribute("class","FButton");
+		await sleep(500);
+	}
+}
+
+
 function powerOn(){
 	if(locked<selected){
 		ACancel = false;
 		toSynvol(adress[locked + 1]);
 	}
-	
 }
 
 function createShevron(){
@@ -93,7 +163,7 @@ function del(){
 	}
 }
 
-function go () {
+function test() {
 	del();
 	create();
 	var anim = document.getElementById("myAnimation").beginElement();
@@ -126,7 +196,7 @@ function ButtonUnselect(id){
 	var items = document.getElementById("Button"+id).setAttribute('class',' ')
 }
 
-function coloration(){
+function testColoration(){
 	colorSet(1,"#1B1BB3");
 }
 
@@ -153,7 +223,7 @@ function selectFind(){
 }
 
 function AdressSet(id){
-	if(!isClearFunction){
+	if(!isClearFunction && !isOpenGate){
 		var isCorrectValues = isIdCorrect(id);
 		var isCorrect = isCorrectValues[0];
 		var find = isCorrectValues[1];
@@ -196,9 +266,10 @@ function AdressSet(id){
 }
 
 async function clearAdress(){
-	if(!isClearFunction){
+	var clsButton = document.getElementById("CLSButton");
+	if(!isClearFunction && !isOpenGate){
 		isClearFunction = true;
-		document.getElementById("CLSButton").setAttribute('class','FButton SelectedButton');
+		clsButton.setAttribute('class','FButton SelectedButton');
 		ACancel = true;
 		if(locked<selected){
 			delSelectSynvols()
@@ -229,16 +300,26 @@ async function clearAdress(){
 				
 			}
 		} while (!isTimeOut);
-		isTimeOut = true;
+		isTimeOut = false;
 		//console.log("FF");
 		r = document.getElementById("SynvolCircle").transform.animVal[0].angle;
 		locked = -1;
 		selected = -1;
-		document.getElementById("ShColorB").setAttribute('class','st4');
+		document.getElementById("ShColorB").setAttribute('class', defaultShevronColorClass);
 		adress = [0,0,0,0,0,0,0,0];
 		Sh = [false,false,false,false,false,false,false,false];
-		document.getElementById("CLSButton").setAttribute('class','FButton');
+		clsButton.setAttribute('class','FButton');
 		isClearFunction = false;
+		if(isPlaneToClear){isPlaneToClear = !isPlaneToClear;}
+	}
+	else if(isOpenGate){
+		isPlaneToClear = !isPlaneToClear;
+		if(isPlaneToClear){
+			clsButton.setAttribute('class','FButton SelectedButton');
+		}
+		else{
+			clsButton.setAttribute('class','FButton');
+		}
 	}
 	
 }
@@ -258,9 +339,10 @@ function delSynvol(id){
 		}
 	}
 	if(bid){
+		//console.log(id);
 		document.getElementById("A"+(tmp+1)).setAttribute('class',"adressImg");
 		document.getElementById("A"+(tmp+1)).setAttribute('src',"");
-		document.getElementById("ShColor"+(tmp+1)).setAttribute('class','st4');
+		document.getElementById("ShColor"+(tmp+1)).setAttribute('class',defaultShevronColorClass);
 		colorSynvolSet(id,"#000000");
 		colorButtonSet(id,"#000000");
 		//ButtonUnselect(id)
@@ -317,7 +399,7 @@ async function toSynvol(id){
 		document.getElementById("ShColorB").setAttribute('class','stS');
 		BaseShevronAnimate();
 		await sleep(750);
-		document.getElementById("ShColorB").setAttribute('class','st4');
+		document.getElementById("ShColorB").setAttribute('class', defaultShevronColorClass);
 	}
 	
 	if(!ACancel){
@@ -361,6 +443,9 @@ function loadsynvol(){
 		else{
 			toSynvol(adress[locked + 1]);
 		}
+	}
+	else if(locked == 7 && isOpenGate){
+		turnOpenGate();
 	}
 }
 
