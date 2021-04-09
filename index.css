@@ -12,8 +12,8 @@ canvas {
 	height: 25px;
 }
 .adressImg{
-	width: 25px;
-	height: 25px;
+	width: 40px;
+	height: 40px;
 }
 .imgWork{
 	background-color: #BF3030;
@@ -24,7 +24,7 @@ canvas {
 
 .imgContainer{
 	display: grid;
-	grid-template-columns: 35px 35px 35px 35px 35px 35px 35px 35px;
+	grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px;
 	
 }
 
@@ -37,11 +37,11 @@ canvas {
 	text-align: left;
 }
 
-.divTable1{
+.adressTable{
 	display: table;
 	width: auto;
 	position: absolute;
-	left: 550px;
+	left: 500px;
 	top: 25px;
 	z-index: 1;
 	border: 1px solid #1B1BB3;

@@ -1,13 +1,39 @@
 var r = 0;
 var RA = false;
+var isAuto = true;
 var Sh = [false,false,false,false,false,false,false,false];
 var ACancel = false;
+var isClearFunction = false;
+var isTimeOut = false;
 var selected = -1;
 var locked = -1;
 var adress = [0,0,0,0,0,0,0,0];
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function AutoTurn(){
+	isAuto = !isAuto;
+	var autoButton = document.getElementById("AutoButton")
+	if(isAuto){
+		autoButton.setAttribute('class','FButton SelectedButton');
+		//powerButton.textContent = 'OFF';
+		powerOn();
+	}
+	else{
+		autoButton.setAttribute('class','FButton');
+		//powerButton.textContent = 'ON';
+		ACancel = true;
+	}
+}
+
+function powerOn(){
+	if(locked<selected){
+		ACancel = false;
+		toSynvol(adress[locked + 1]);
+	}
+	
 }
 
 function createShevron(){
@@ -127,48 +153,151 @@ function selectFind(){
 }
 
 function AdressSet(id){
-	var isCorrectValues = isIdCorrect(id);
-	var isCorrect = isCorrectValues[0];
-	var find = isCorrectValues[1];
-	console.log(selected + " " + ACancel);
-	if(selected<7 && isCorrect){
-		var tmpS = selectFind();
-		ButtonSelect(id);
-		selected = selected + 1;
-		
-		adress[tmpS] = id;
-		document.getElementById("A"+(tmpS+1)).setAttribute('src',"Synvols/S" + id + ".svg");
-		if(RA){
+	if(!isClearFunction){
+		var isCorrectValues = isIdCorrect(id);
+		var isCorrect = isCorrectValues[0];
+		var find = isCorrectValues[1];
+		//console.log(selected + " " + ACancel);
+		if(selected<7 && isCorrect){
+			var tmpS = selectFind();
+			ButtonSelect(id);
+			selected = selected + 1;
 			
+			adress[tmpS] = id;
+			document.getElementById("A"+(tmpS+1)).setAttribute('src',"Synvols/S" + id + ".svg");
+			if(RA){
+				
+			}
+			else{
+				if(isAuto){
+					ACancel = false;
+					toSynvol(id);
+				}
+			}
 		}
 		else{
-			ACancel = false;
-			toSynvol(id);
-		}
-	}
-	else{
-		//console.log(isCorrect == false); //loaded + 1 < find) " " + find + " ] " + adress);
-		//console.log(locked + 1 < find);
-		if(!isCorrect && locked + 1 <= find){
-			if (locked + 1 == find){
-				//stop();
-				ACancel = true;
+			//console.log(isCorrect == false); //loaded + 1 < find) " " + find + " ] " + adress);
+			//console.log(locked + 1 < find);
+			if(!isCorrect && locked + 1 <= find){
+				if (locked + 1 == find){
+					//stop();
+					ACancel = true;
+				}
+				ButtonUnselect(adress[find]);
+				document.getElementById("A"+(find+1)).setAttribute('src',"");
+				adress[find] = 0;
+				selected = selected - 1;
+				
+				
 			}
-			ButtonUnselect(adress[find]);
-			document.getElementById("A"+(find+1)).setAttribute('src',"");
-			adress[find] = 0;
-			selected = selected - 1;
-			
-			
 		}
 	}
-}
-
-function clearAdress(){
 	
 }
 
+async function clearAdress(){
+	if(!isClearFunction){
+		isClearFunction = true;
+		document.getElementById("CLSButton").setAttribute('class','FButton SelectedButton');
+		ACancel = true;
+		if(locked<selected){
+			delSelectSynvols()
+		}
+		
+		del();
+		create(null,11);
+		document.getElementById("myAnimation").beginElement();
+		timeOut();
+		document.getElementById("ShColorB").setAttribute('class','stR');
+		var str = "";
+		for(let i = 0; i < adress.length; i++ ){
+			str = str + (360-(((adress[i]-1)*5.63)+2.81)) + " ";
+		}
+		console.log(str);
+		do {
+			await sleep(1);
+			var tmpR = document.getElementById("SynvolCircle").transform.animVal[0].angle;
+			//console.log(tmpR);
+			if(tmpR>360){tmpR = tmpR - 360;}
+			if(tmpR<0){tmpR = tmpR + 360;}
+			var checkVaule = checkedAdressItem(tmpR);
+			if(checkVaule[0]){
+				for(let i = 0; i < checkVaule[1].length; i++ ){
+					colorSynvolSet(checkVaule[1][i],"#FF0000");
+					delSynvol(checkVaule[1][i])
+				}
+				
+			}
+		} while (!isTimeOut);
+		isTimeOut = true;
+		//console.log("FF");
+		r = document.getElementById("SynvolCircle").transform.animVal[0].angle;
+		locked = -1;
+		selected = -1;
+		document.getElementById("ShColorB").setAttribute('class','st4');
+		adress = [0,0,0,0,0,0,0,0];
+		Sh = [false,false,false,false,false,false,false,false];
+		document.getElementById("CLSButton").setAttribute('class','FButton');
+		isClearFunction = false;
+	}
+	
+}
+
+async function timeOut(){
+	await sleep(11000);
+	isTimeOut = true;
+}
+
+function delSynvol(id){
+	var tmp = 0;
+	var bid = false;
+	for(let i = 0; i < adress.length; i++ ){
+		if(adress[i] == id){
+			tmp = i;
+			bid = true;
+		}
+	}
+	if(bid){
+		document.getElementById("A"+(tmp+1)).setAttribute('class',"adressImg");
+		document.getElementById("A"+(tmp+1)).setAttribute('src',"");
+		document.getElementById("ShColor"+(tmp+1)).setAttribute('class','st4');
+		colorSynvolSet(id,"#000000");
+		colorButtonSet(id,"#000000");
+		//ButtonUnselect(id)
+	}
+}
+
+function delSelectSynvols(){
+	for(let i = locked+1; i < adress.length; i++ ){
+		if(adress[i] != 0){
+			ButtonUnselect(adress[i]);
+			document.getElementById("A"+(i+1)).setAttribute('src',"");
+			document.getElementById("A"+(i+1)).setAttribute('class',"adressImg");
+			adress[i]=0;
+		}
+	}
+}
+
+function checkedAdressItem(rc){
+	var ret = [];
+	var j = 0;
+	var bret = false;
+	for(let i = 0; i < adress.length; i++ ){
+		if(adress[i] != 0){
+			var rid = 360-(((adress[i]-1)*5.63)+2.81);
+			if(rc <= rid+5 && rc >= rid-5){
+				bret = true;
+				ret[j] = adress[i];
+				j = j + 1;
+			}
+		}
+		
+	}
+	return [bret, ret];
+}
+
 async function toSynvol(id){
+	if(id == 0){return;}
 	RA = true;
 	if(!ACancel){
 		del();
