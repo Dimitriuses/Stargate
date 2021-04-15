@@ -1,6 +1,9 @@
 var r = 0;
 var defaultShevronColorClass = "st5"
+var defGateCenter = [282.902,268.802];
+var UperConstant = 37.7;
 var RA = false;
+var isDephragm = false;
 var isOpenGate = false;
 var isAuto = true;
 var Sh = [false,false,false,false,false,false,false,false];
@@ -8,6 +11,7 @@ var ACancel = false;
 var isClearFunction = false;
 var isPlaneToClear = false;
 var isTimeOut = false;
+
 var selected = -1;
 var locked = -1;
 var adress = [0,0,0,0,0,0,0,0];
@@ -55,6 +59,32 @@ function TurnGate(){
 	
 }
 
+function turnDephragm(){
+	turnButtonDephragm();
+	turnIRISDeaphragm();
+	//document.getElementById("AD1").beginElement();
+}
+function turnButtonDephragm(){
+	isDephragm = !isDephragm;
+	var dbutton = document.getElementById("TutnDephragmButton");
+	if(isDephragm){
+		dbutton.setAttribute("class","FButton SelectedButton");
+	}
+	else{
+		dbutton.setAttribute("class","FButton");
+	}
+}
+
+function turnIRISDeaphragm(){
+	var tmpS = "T"
+	if(!isDephragm){tmpS = "F";}
+	for(let i = 0; i < 24; i++ ){
+		console.log(i+1);
+		document.getElementById("AD"+(i+1)+tmpS).beginElement();
+	}
+	
+}
+
 function turnButtonGate(){
 	isOpenGate = !isOpenGate;
 	var gbutton = document.getElementById("TurnGateButton");
@@ -65,6 +95,7 @@ function turnButtonGate(){
 		gbutton.setAttribute("class","FButton");
 	}
 }
+
 async function turnOpenGate(){
 	var gate = document.getElementById("Portall");
 	if(isOpenGate){
@@ -126,6 +157,55 @@ function createShevron(){
 }
 createShevron();
 
+
+function createDiaphram(){
+	for(let i = 0; i < 24; i++ ){
+		createDephragmAnim(i+1,true);
+		createDephragmAnim(i+1,false);
+	}
+}
+createDiaphram()
+
+function createDephragmAnim(id,turn){
+	var AX = document.getElementById("AP"+id).x1.baseVal.value;
+	var AY = document.getElementById("AP"+id).y1.baseVal.value;
+	
+	var AON = -60;
+	var AOFF = 0;
+	var myanim=document.createElementNS("http://www.w3.org/2000/svg", 'animateTransform');
+	if(turn){
+		myanim.setAttribute("id","AD"+id+"T"); 
+	}
+	else{
+		myanim.setAttribute("id","AD"+id+"F"); 
+	}
+	
+	myanim.setAttribute("attributeType","XML"); 
+	myanim.setAttribute("attributeName","transform"); 
+	myanim.setAttribute("type","rotate");
+	if(turn){
+		myanim.setAttribute("from", AOFF + " " + AX + " " + AY);
+		myanim.setAttribute("to", AON + " " + AX + " " + AY); 
+	}
+	else{
+		myanim.setAttribute("from", AON + " " + AX + " " + AY);
+		myanim.setAttribute("to", AOFF + " " + AX + " " + AY); 
+	}
+	
+	myanim.setAttribute("dur","2s"); 
+	
+	myanim.setAttribute("calcMode","spline");
+	myanim.setAttribute("keyTimes","0;1");
+	myanim.setAttribute("keySplines","0.42,0 0.58,1");
+	
+	myanim.setAttribute("fill","freeze"); 
+	myanim.setAttribute("begin","indefinite"); 
+	myanim.setAttribute("repeatCount","1"); 
+	
+	var myPath = document.getElementById("D"+id);
+	myPath.appendChild(myanim);
+}
+
 function create(to,dur){
 	var myanim=document.createElementNS("http://www.w3.org/2000/svg", 'animateTransform');
 	myanim.setAttribute("id","myAnimation"); 
@@ -133,12 +213,12 @@ function create(to,dur){
 	myanim.setAttribute("attributeName","transform"); 
 	myanim.setAttribute("type","rotate");
 	
-	myanim.setAttribute("from",r+" 282.902  268.802"); 
+	myanim.setAttribute("from",r+" "+defGateCenter[0]+" " +defGateCenter[1]); 
 	if(to == null){
-		myanim.setAttribute("to",(360+r)+" 282.902  268.802"); 
+		myanim.setAttribute("to",(360+r)+" "+defGateCenter[0]+" " +defGateCenter[1]); 
 	}
 	else{
-		myanim.setAttribute("to",to+" 282.902  268.802"); 
+		myanim.setAttribute("to",to+" "+defGateCenter[0]+" " +defGateCenter[1]); 
 	}
 	if(dur == null){dur = 10;}
 	myanim.setAttribute("dur",dur+"s"); 
